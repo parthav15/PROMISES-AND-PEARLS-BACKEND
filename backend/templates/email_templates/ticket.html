@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Your Event Ticket</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        .header h1 {
+            margin: 0;
+            color: #333333;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .ticket-details {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .ticket-details p {
+            margin: 5px 0;
+            color: #555555;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888888;
+            border-top: 1px solid #eeeeee;
+            padding-top: 15px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Your Event Ticket</h1>
+        </div>
+        <div class="content">
+            <p>Dear {{ user.first_name }},</p>
+            <p>Thank you for booking your ticket for the event <strong>{{ event.title }}</strong>.</p>
+            <div class="ticket-details">
+                <p><strong>Booking ID:</strong> {{ booking.id }}</p>
+                <p><strong>Tickets:</strong> {{ booking.ticket_quantity }}</p>
+                <p><strong>Total Price:</strong> ₹{{ booking.total_price }}</p>
+            </div>
+            <p>Please find your ticket attached as a PDF to this email. We look forward to seeing you at the event!</p>
+            <a href="#" class="btn">View Event Details</a>
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Promises and Pearls. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
