@@ -84,12 +84,10 @@ def get_specific_public_event(request):
             'images': [{
                 'id': image.id,
                 'url': image.image.url,
-                'description': image.description,
             } for image in event.event_images.all()],
             'videos': [{
                 'id': video.id,
                 'url': video.video.url,
-                'description': video.description,
             } for video in event.event_videos.all()],
         }}, status=200)
     

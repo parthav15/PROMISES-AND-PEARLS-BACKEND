@@ -26,10 +26,13 @@ def create_order(request):
     booking = get_object_or_404(Booking, id=booking_id)
 
     amount = booking.total_price
+    gst_amount = Decimal(0.18) * amount
+    other_amount = Decimal(50)
+    total_amount = amount + gst_amount + other_amount
     
     try:
         order_data = {
-            'amount': int(Decimal(amount) * 100),
+            'amount': int(Decimal(total_amount) * 100),
             'currency': currency,
             'receipt': str(booking_id),
             'payment_capture': 1
@@ -38,10 +41,14 @@ def create_order(request):
 
         payment = Payment.objects.create(
             booking=booking,
-            amount=Decimal(amount),
+            amount=total_amount,
             status='Pending',
             transaction_id=razorpay_order['id']
         )
+
+        booking.payment = payment
+        booking.total_price = total_amount
+        booking.save()
 
         return JsonResponse({
             'success': True,
@@ -90,7 +97,7 @@ def verify_order(request):
         )
 
         try:
-            send_ticket(booking.event, booking.user, booking)
+            send_ticket(booking.event, booking)
         except Exception as e:
             print(f"Error sending ticket: {str(e)}")
 
