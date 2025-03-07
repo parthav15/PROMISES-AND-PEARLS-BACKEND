@@ -1,6 +1,6 @@
 import json
 
-from events.models import EventRequest
+from events.models import EventRequest, Event
 
 from users.utils import jwt_decode, auth_user
 from users.models import CustomUser

@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
-def upload_event_images(request, event_id):
+def upload_event_images(request):
     try:
         bearer = request.headers.get('Authorization')
         if not bearer:
@@ -22,6 +22,10 @@ def upload_event_images(request, event_id):
     
     if request.method == 'POST':
         try:
+            event_id = request.POST.get('event_id')
+            if not event_id:
+                return JsonResponse({'success': False, 'message': 'Event ID is required.'}, status=400)
+            
             event = Event.objects.get(id=event_id)
         except Event.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Event not found.'}, status=404)
@@ -41,7 +45,7 @@ def upload_event_images(request, event_id):
         return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 
 @csrf_exempt
-def get_all_images_for_event(request, event_id):
+def get_all_images_for_event(request):
     try:
         bearer = request.headers.get('Authorization')
         if not bearer:
@@ -53,8 +57,12 @@ def get_all_images_for_event(request, event_id):
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'Unexpected error: {str(e)}'}, status=500)
     
-    if request.method == 'GET':
+    if request.method == 'POST':
         try:
+            event_id = request.POST.get('event_id')
+            if not event_id:
+                return JsonResponse({'success': False, 'message': 'Event ID is required.'}, status=400)
+            
             event = Event.objects.get(id=event_id)
         except Event.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Event not found.'}, status=404)
@@ -71,7 +79,7 @@ def get_all_images_for_event(request, event_id):
         return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 
 @csrf_exempt
-def delete_event_image(request, event_id, image_id):
+def delete_event_image(request):
     try:
         bearer = request.headers.get('Authorization')
         if not bearer:
@@ -83,8 +91,13 @@ def delete_event_image(request, event_id, image_id):
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'Unexpected error: {str(e)}'}, status=500)
     
-    if request.method == 'DELETE':
+    if request.method == 'POST':
         try:
+            event_id = request.POST.get('event_id')
+            image_id = request.POST.get('image_id')
+            if not event_id or not image_id:
+                return JsonResponse({'success': False, 'message': 'Event ID and Image ID are required.'}, status=400)
+            
             event = Event.objects.get(id=event_id)
         except Event.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Event not found.'}, status=404)
@@ -101,7 +114,7 @@ def delete_event_image(request, event_id, image_id):
         return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 
 @csrf_exempt
-def upload_event_video(request, event_id):
+def upload_event_video(request):
     try:
         bearer = request.headers.get('Authorization')
         if not bearer:
@@ -115,6 +128,10 @@ def upload_event_video(request, event_id):
     
     if request.method == 'POST':
         try:
+            event_id = request.POST.get('event_id')
+            if not event_id:
+                return JsonResponse({'success': False, 'message': 'Event ID is required.'}, status=400)
+            
             event = Event.objects.get(id=event_id)
         except Event.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Event not found.'}, status=404)
@@ -136,7 +153,7 @@ def upload_event_video(request, event_id):
         return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 
 @csrf_exempt
-def get_all_videos_for_event(request, event_id):
+def get_all_videos_for_event(request):
     try:
         bearer = request.headers.get('Authorization')
         if not bearer:
@@ -148,8 +165,12 @@ def get_all_videos_for_event(request, event_id):
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'Unexpected error: {str(e)}'}, status=500)
     
-    if request.method == 'GET':
+    if request.method == 'POST':
         try:
+            event_id = request.POST.get('event_id')
+            if not event_id:
+                return JsonResponse({'success': False, 'message': 'Event ID is required.'}, status=400)
+            
             event = Event.objects.get(id=event_id)
         except Event.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Event not found.'}, status=404)

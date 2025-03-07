@@ -14,11 +14,11 @@ urlpatterns = [
     path('get_events_by_organizer/<int:user_id>/', event_views.get_events_by_organizer, name='get_events_by_organizer'),
 
     # EVENT MEDIA API's
-    path('upload_event_images/<int:event_id>/', eventmedia_views.upload_event_images, name='upload_event_images'),
-    path('get_all_images_for_event/<int:event_id>/', eventmedia_views.get_all_images_for_event, name='get_all_images_for_event'),
-    path('delete_event_image/<int:event_id>/<int:image_id>/', eventmedia_views.delete_event_image, name='delete_event_image'),
-    path('upload_event_video/<int:event_id>/', eventmedia_views.upload_event_video, name='upload_event_video'),
-    path('get_all_videos_for_event/<int:event_id>/', eventmedia_views.get_all_videos_for_event, name='get_all_videos_for_event'),
+    path('upload_event_images/', eventmedia_views.upload_event_images, name='upload_event_images'),
+    path('get_all_images_for_event/', eventmedia_views.get_all_images_for_event, name='get_all_images_for_event'),
+    path('delete_event_image/', eventmedia_views.delete_event_image, name='delete_event_image'),
+    path('upload_event_video/', eventmedia_views.upload_event_video, name='upload_event_video'),
+    path('get_all_videos_for_event/', eventmedia_views.get_all_videos_for_event, name='get_all_videos_for_event'),
 
     # INVITEE's API's
     path('add_invitees_to_event/<int:event_id>/', invitee_views.add_invitees_to_event, name='add_invitees_to_event'),
