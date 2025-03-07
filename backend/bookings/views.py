@@ -108,6 +108,16 @@ def get_booking_detail(request):
     except Exception as e:
         return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
+    ticket_details = []
+    for ticket in booking.tickets.all():
+        ticket_details.append({
+            'id': ticket.id,
+            'ticket_id': ticket.ticket_id,
+            'ticket_path': f"media/tickets/{ticket.attendee['firstName']}_{booking.event.title}_{booking.event.start_date.strftime('%d%B%Y')}.pdf",
+            'attendee': ticket.attendee,
+            'qr_code_url': ticket.qr_code.url if ticket.qr_code else None
+        })
+
     return JsonResponse({
         'success': True,
         'message': 'Booking details retrieved successfully',
@@ -128,7 +138,8 @@ def get_booking_detail(request):
             },
             'ticket_quantity': booking.ticket_quantity,
             'total_price': str(booking.total_price),
-            'booking_status': booking.booking_status
+            'booking_status': booking.booking_status,
+            'tickets': ticket_details
         }
     })
 
