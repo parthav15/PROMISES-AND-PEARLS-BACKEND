@@ -1,4 +1,10 @@
 import json
+from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.conf import settings
 
 from events.models import EventRequest, Event
 
@@ -8,7 +14,9 @@ from users.models import CustomUser
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+from django.core.mail import EmailMessage
 
 @csrf_exempt
 def create_eventrequest(request):
@@ -26,15 +34,15 @@ def create_eventrequest(request):
             user_email = decoded_token.get('email')
             
             try:
-                user = CustomUser .objects.get(email=user_email)
-            except CustomUser .DoesNotExist:
-                return JsonResponse({'success': False, 'message': 'User  not found.'}, status=404)
+                user = CustomUser.objects.get(email=user_email)
+            except CustomUser.DoesNotExist:
+                return JsonResponse({'success': False, 'message': 'User not found.'}, status=404)
 
             data = json.loads(request.body)
-            expected_start_date = datetime.strptime(data.get('expected_start_date'), '%Y-%m-%dT%H:%M') + timedelta(hours=3)
-            expected_end_date = datetime.strptime(data.get('expected_end_date'), '%Y-%m-%dT%H:%M') + timedelta(hours=3)
+            expected_start_date = datetime.strptime(data.get('expected_start_date'), '%Y-%m-%dT%H:%M')
+            expected_end_date = datetime.strptime(data.get('expected_end_date'), '%Y-%m-%dT%H:%M')
 
-            if expected_start_date < datetime.now() + timedelta(hours=3):
+            if expected_start_date < datetime.now():
                 return JsonResponse({'success': False, 'message': 'Event start date cannot be in the past.'}, status=400)
 
             if expected_end_date < expected_start_date:
@@ -50,6 +58,37 @@ def create_eventrequest(request):
                 expected_guests=data.get('expected_guests'),
                 budget=data.get('budget'),
             )
+
+            superuser_html = render_to_string('email_templates/superuser_eventrequest.html', {
+                'event_request': event_request,
+                'user': user,
+                'user_email': user_email,
+            })
+
+            user_html = render_to_string('email_templates/user_eventrequest.html', {
+                'event_request': event_request,
+                'user': user,
+                'user_email': user_email,
+            })
+
+            EmailMessage(
+                subject='New Event Request Submission',
+                message='',
+                html_message=superuser_html,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.SUPERUSER_EMAIL],
+                fail_silently=False,
+            ).send(fail_silently=False)
+
+            EmailMessage(
+                subject='Your Event Request is Received!',
+                message='',
+                html_message=user_html,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user_email],
+                fail_silently=False,
+            ).send(fail_silently=False)
+
             return JsonResponse({'success': True, 'message': 'Event request created successfully', 'data': {
                 'id': event_request.id,
                 'title': event_request.title,
@@ -66,7 +105,7 @@ def create_eventrequest(request):
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'message': 'Invalid JSON in request body.'}, status=400)
         except Exception as e:
-            return JsonResponse({'success': False, 'message': f"Error requesting event: {e}"}, status=500)
+            return JsonResponse({'success': False, 'message': f"Error requesting event: {str(e)}"}, status=500)
 
 @csrf_exempt
 def edit_eventrequest(request, request_id):

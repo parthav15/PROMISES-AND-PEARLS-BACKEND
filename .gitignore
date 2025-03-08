@@ -24,3 +24,5 @@ backend/static/
 *.webm
 *.zip
 *.rar
+backend/media/.DS_Store
+backend/.DS_Store
