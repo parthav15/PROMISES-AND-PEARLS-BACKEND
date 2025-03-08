@@ -12,6 +12,7 @@ from users.models import CustomUser
 from users.utils import jwt_decode, auth_user
 
 import json
+import uuid
 
 from bookings.e_ticket import generate_pdf_ticket
 
@@ -223,12 +224,20 @@ def verify_ticket(request):
     ticket_id = request.POST.get('ticket_id')
 
     try:
-        ticket = Ticket.objects.get(id=ticket_id)
+        ticket_uuid = uuid.UUID(ticket_id)
+    except ValueError:
+        return JsonResponse({
+            'success': False,
+            'message': 'Invalid ticket ID format. Expected a valid UUID.',
+        }, status=400)
+
+    try:
+        ticket = Ticket.objects.get(ticket_id=ticket_uuid)
         return JsonResponse({
             'success': True,
             'message': 'Ticket verified successfully',
             'data': {
-                'id': ticket.id,
+                'id': str(ticket.id),
                 'event': {
                     'id': ticket.booking.event.id,
                     'title': ticket.booking.event.title,
@@ -247,7 +256,7 @@ def verify_ticket(request):
                 'booking_status': ticket.booking.booking_status,
                 'tickets': [
                     {
-                        'id': ticket.id,
+                        'id': str(ticket.id),
                         'attendee': ticket.attendee,
                         'qr_code': ticket.qr_code.url,
                         'created_at': ticket.created_at.strftime("%B %d, %Y, %I:%M %p")
@@ -255,11 +264,6 @@ def verify_ticket(request):
                 ]
             }
         })
-    except Ticket.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'message': 'Ticket not found',
-        }, status=404)
     except Exception as e:
         return JsonResponse({
             'success': False,
