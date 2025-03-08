@@ -71,23 +71,23 @@ def create_eventrequest(request):
                 'user_email': user_email,
             })
 
-            EmailMessage(
+            superuser_email_message = EmailMessage(
                 subject='New Event Request Submission',
-                message='',
-                html_message=superuser_html,
+                body=superuser_html,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.SUPERUSER_EMAIL],
-                fail_silently=False,
-            ).send(fail_silently=False)
+                to=[settings.SUPERUSER_EMAIL],
+            )
+            superuser_email_message.content_subtype = 'html'
+            superuser_email_message.send(fail_silently=False)
 
-            EmailMessage(
+            user_email_message = EmailMessage(
                 subject='Your Event Request is Received!',
-                message='',
-                html_message=user_html,
+                body=user_html,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user_email],
-                fail_silently=False,
-            ).send(fail_silently=False)
+                to=[user_email],
+            )
+            user_email_message.content_subtype = 'html'
+            user_email_message.send(fail_silently=False)
 
             return JsonResponse({'success': True, 'message': 'Event request created successfully', 'data': {
                 'id': event_request.id,
