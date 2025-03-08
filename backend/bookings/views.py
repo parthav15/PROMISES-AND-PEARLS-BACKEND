@@ -216,3 +216,52 @@ def send_ticket_api(request):
             'success': False,
             'message': f'Unexpected error: {str(e)}',
         }, status=500)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def verify_ticket(request):
+    ticket_id = request.POST.get('ticket_id')
+
+    try:
+        ticket = Ticket.objects.get(id=ticket_id)
+        return JsonResponse({
+            'success': True,
+            'message': 'Ticket verified successfully',
+            'data': {
+                'id': ticket.id,
+                'event': {
+                    'id': ticket.booking.event.id,
+                    'title': ticket.booking.event.title,
+                    'location': ticket.booking.event.location,
+                    'start_date': ticket.booking.event.start_date.strftime("%B %d, %Y, %I:%M %p") if ticket.booking.event.start_date else None,
+                    'end_date': ticket.booking.event.end_date.strftime("%B %d, %Y, %I:%M %p") if ticket.booking.event.end_date else None,
+                },
+                'lead_user': {
+                    'id': ticket.booking.lead_user.id,
+                    'email': ticket.booking.lead_user.email,
+                    'first_name': ticket.booking.lead_user.first_name,
+                    'last_name': ticket.booking.lead_user.last_name
+                },
+                'ticket_quantity': ticket.booking.ticket_quantity,
+                'total_price': str(ticket.booking.total_price),
+                'booking_status': ticket.booking.booking_status,
+                'tickets': [
+                    {
+                        'id': ticket.id,
+                        'attendee': ticket.attendee,
+                        'qr_code': ticket.qr_code.url,
+                        'created_at': ticket.created_at.strftime("%B %d, %Y, %I:%M %p")
+                    }
+                ]
+            }
+        })
+    except Ticket.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Ticket not found',
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Unexpected error: {str(e)}',
+        }, status=500)
