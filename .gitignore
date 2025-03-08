@@ -26,3 +26,5 @@ backend/static/
 *.rar
 backend/media/.DS_Store
 backend/.DS_Store
+
+*.pyc
